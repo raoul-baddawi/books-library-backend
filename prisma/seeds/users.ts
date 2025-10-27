@@ -5,10 +5,9 @@ import type { Prisma, PrismaClient } from "$prisma/client";
 function generateUserSeed() {
   return {
     email: faker.internet.email(),
-    phone: faker.helpers.maybe(() => faker.phone.number()),
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
-    sub: faker.string.uuid()
+    password: faker.internet.password()
   } satisfies Prisma.UserCreateManyInput;
 }
 

@@ -7,7 +7,6 @@ export const envSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().int(),
   DATABASE_URL: z.url(),
-  SENTRY_DSN: z.url()
 });
 
 export type EnvSchema = z.infer<typeof envSchema>;

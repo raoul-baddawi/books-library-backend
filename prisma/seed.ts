@@ -2,10 +2,8 @@ import { exec } from "node:child_process";
 
 import { Logger } from "@nestjs/common";
 
-import { PrismaClient } from "$prisma/client";
-
-import { seedComments } from "./seeds/comments";
-import { seedPosts } from "./seeds/posts";
+import { PrismaClient } from "../generated/prisma/client";
+import { seedBooks } from "./seeds/books";
 import { seedUsers } from "./seeds/users";
 
 const prisma = new PrismaClient();
@@ -33,18 +31,14 @@ async function main() {
 
   Logger.log("Seeding users...");
   await seedUsers(prisma);
+  Logger.log("Users seeded!");
   const userIds = (await prisma.user.findMany({ select: { id: true } })).map(
     ({ id }) => id
   );
 
-  Logger.log("Seeding posts...");
-  await seedPosts(prisma, { authorIds: userIds });
-  const postIds = (await prisma.post.findMany({ select: { id: true } })).map(
-    ({ id }) => id
-  );
-
-  Logger.log("Seeding comments...");
-  await seedComments(prisma, { postIds, authorIds: userIds });
+  Logger.log("Seeding books...");
+  await seedBooks(prisma, { authorIds: userIds });
+  Logger.log("Books seeded!");
 }
 
 main()

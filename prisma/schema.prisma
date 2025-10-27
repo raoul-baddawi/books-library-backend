@@ -10,14 +10,6 @@ generator erd {
   output   = "./generated/erd.svg"
 }
 
-generator typescriptInterfaces {
-  provider    = "prisma-generator-typescript-interfaces"
-  modelPrefix = "I"
-  dateType    = "string"
-  prettier    = true
-  output      = "./generated/types.ts"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -30,47 +22,28 @@ model User {
 
   firstName String
   lastName  String
-  email     String  @unique
-  sub       String  @unique
-  phone     String? @unique
+  email     String @unique
+  password  String
 
-  posts    Post[]
-  comments Comment[]
+  books Book[]
 
   @@index([email])
-  @@index([sub])
 }
 
-model Post {
+model Book {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title       String
-  content     String
+  name        String
+  description String
+  media       String[]
+
   published   Boolean   @default(false)
-  publishedAt DateTime?
+  publishedAt DateTime? @default(now())
 
   authorId Int
   author   User @relation(fields: [authorId], references: [id])
-
-  comments Comment[]
 
   @@index([authorId])
-}
-
-model Comment {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  content String
-
-  postId Int
-  post   Post @relation(fields: [postId], references: [id])
-
-  authorId Int
-  author   User @relation(fields: [authorId], references: [id])
-
-  @@index([postId])
 }

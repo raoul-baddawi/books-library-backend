@@ -1,9 +1,7 @@
-import "./instrument";
 
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
-import * as Sentry from "@sentry/nestjs";
 
 import { AppModule } from "./app.module";
 import type { EnvSchema } from "./config/config.schema";
@@ -29,6 +27,5 @@ async function bootstrap() {
 
 bootstrap().catch((e) => {
   console.error(e);
-  Sentry.captureException(e);
   process.exit(1);
 });

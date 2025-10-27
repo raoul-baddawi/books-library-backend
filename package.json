@@ -6,6 +6,12 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "seed": "ts-node prisma/seed.ts",
+    "generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:reset": "npx prisma migrate reset",
+    "studio": "npx prisma studio",
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",

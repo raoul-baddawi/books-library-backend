@@ -1,0 +1,95 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    environment: production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment variables
+        run: |
+          cat << 'EOF' > .env
+          ${{secrets.APP_ENV}}
+          EOF
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate prisma client
+        run: pnpm exec prisma generate
+        env:
+          DISABLE_ERD: true
+
+      - name: Build
+        run: pnpm build
+
+      - name: Remove dev dependencies
+        run: pnpm install --prod --frozen-lockfile --ignore-scripts
+
+      - name: Transfer files
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: -az
+          rsh: -c aes128-gcm@openssh.com
+          path: dist node_modules generated .env
+          remote_path: ~/app-temp/
+          remote_user: ubuntu
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy with SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            if [ ! -d "app" ]; then
+                mkdir app
+            fi
+            mv app app-previous
+            mv app-temp app
+
+            if pm2 list | grep -q "${{secrets.APP_NAME}}"; then
+              pm2 restart "${{secrets.APP_NAME}}"
+            else
+              cd app
+              pm2 start dist/main.js --name "${{secrets.APP_NAME}}" --time
+              cd ~
+            fi
+
+            rm -rf ~/app-previous

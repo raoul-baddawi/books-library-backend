@@ -15,10 +15,7 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     await this.prisma.user.create({
-      data: {
-        ...data,
-        sub: crypto.randomUUID()
-      }
+      data
     });
   }
 

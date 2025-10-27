@@ -1,18 +1,27 @@
-message=$(cat "$1")
+message=$(cat "$1" | tr -d '\r' | grep -vE '^\s*$' | grep -vE '^#' | head -n 1)
 
-action="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)"
-scope="(\(.{2,}\))?"
-description=": .{1,50}"
-detailed_description="(\n.*)?"
-base_pattern="$action$scope$description$detailed_description"
-merge_pattern="Merge .{1,50}"
-pattern="^($base_pattern|$merge_pattern)$"
+# Remove trailing spaces
+message=$(echo "$message" | sed 's/[[:space:]]*$//')
+
+# Bash-safe regex
+pattern="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.{2,}\))?: .{1,50}$|^Merge .{1,50}$"
 
 if ! [[ $message =~ $pattern ]]; then
   echo "Error: Commit message does not follow the required format."
-  echo "Valid formats are examples:"
+  echo "Got: '$message'"
+  echo ""
+  echo "Valid commit message examples:"
   echo " • feat: add 'graphiteWidth' option"
   echo " • fix: handle events on blur input"
   echo " • docs(README): add 'graphiteWidth' option"
+  echo " • style(parser): format code properly"
+  echo " • refactor: improve performance of loop"
+  echo " • Merge branch 'main' into feature-x"
+  echo ""
+  echo "Commit message format rules:"
+  echo " • type(scope?): description"
+  echo " • type: one of feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+  echo " • scope (optional) should be at least 2 characters, e.g., (README)"
+  echo " • description max 50 characters"
   exit 1
 fi
