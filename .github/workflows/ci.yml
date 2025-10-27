@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+    types: ["opened", "edited", "reopened", "synchronize", "ready_for_review"]
+    branches:
+      - main
+      - staging
+
+jobs:
+  CI:
+    if: github.event.pull_request.draft == false
+
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate database schema
+        run: pnpm exec prisma generate
+        env:
+          DISABLE_ERD: true
+
+      - name: Type-check
+        run: pnpm run type:check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Format
+        run: pnpm run format
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff-index --quiet HEAD --; then
+            echo "git_has_changes=false" >> $GITHUB_ENV
+          else
+            echo "git_has_changes=true" >> $GITHUB_ENV
+          fi
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        if: env.git_has_changes == 'true'
+        with:
+          commit_message: "chore: CI - lint and format code"
+          commit_options: "--no-verify"

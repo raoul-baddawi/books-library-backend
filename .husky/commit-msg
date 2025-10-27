@@ -1,0 +1,18 @@
+message=$(cat "$1")
+
+action="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)"
+scope="(\(.{2,}\))?"
+description=": .{1,50}"
+detailed_description="(\n.*)?"
+base_pattern="$action$scope$description$detailed_description"
+merge_pattern="Merge .{1,50}"
+pattern="^($base_pattern|$merge_pattern)$"
+
+if ! [[ $message =~ $pattern ]]; then
+  echo "Error: Commit message does not follow the required format."
+  echo "Valid formats are examples:"
+  echo " • feat: add 'graphiteWidth' option"
+  echo " • fix: handle events on blur input"
+  echo " • docs(README): add 'graphiteWidth' option"
+  exit 1
+fi
