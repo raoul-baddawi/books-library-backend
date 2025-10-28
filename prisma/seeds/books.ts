@@ -12,7 +12,7 @@ function generateBookSeed(authorId: number) {
     media: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, () =>
       faker.image.urlLoremFlickr({ category: "books" })
     ),
-    published: isPublished,
+    isPublished,
     publishedAt,
     authorId
   } satisfies Prisma.BookCreateManyInput;

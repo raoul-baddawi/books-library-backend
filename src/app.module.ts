@@ -1,16 +1,26 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { APP_FILTER } from "@nestjs/core";
-import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
+import { APP_GUARD } from "@nestjs/core";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import { UsersModule } from "./api/users/users.module";
 import { AppController } from "./app.controller";
 import { envSchema } from "./config/config.schema";
 import { validateConfig } from "./config/config.utils";
 import { PrismaModule } from "./integrations/prisma/prisma.module";
+import { BooksModule } from "./api/books/books.module";
 
 @Module({
   imports: [
+    // Sentry integration can be added  on real production application
+    // SentryModule.forRoot(),
+
+    ThrottlerModule.forRoot([
+      {
+        limit: 300, // 100 requests per
+        ttl: 3000 // 3 seconds
+      }
+    ]),
     ConfigModule.forRoot({
       isGlobal: true,
       // ignoreEnvFile: process.env.NODE_ENV === "production",
@@ -25,16 +35,21 @@ import { PrismaModule } from "./integrations/prisma/prisma.module";
       ],
       validate: (config) => validateConfig(envSchema, config)
     }),
-    SentryModule.forRoot(),
     PrismaModule,
-    UsersModule
+    UsersModule,
+    BooksModule
   ],
   controllers: [AppController],
   providers: [
     {
-      provide: APP_FILTER,
-      useClass: SentryGlobalFilter
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
     }
+    // I would also add SentryGlobalFilter on real production application
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: SentryGlobalFilter
+    // }
   ]
 })
 export class AppModule {}

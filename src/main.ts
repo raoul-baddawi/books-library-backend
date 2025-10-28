@@ -1,13 +1,17 @@
-
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 
 import { AppModule } from "./app.module";
 import type { EnvSchema } from "./config/config.schema";
 import { CustomZodValidationPipe } from "./core/pipes/validation.pipe";
+import { CORS_CONFIG } from "./utils/constants/config.constants";
+import cookieParser from "cookie-parser";
+import * as bodyParser from "body-parser";
 
 async function bootstrap() {
+  // I could use fastify instead of express for a real production application
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // if we don't cast the ConfigService, it will not infer the types correctly
@@ -20,7 +24,20 @@ async function bootstrap() {
   // enable extended query parsing for express version 11 and above
   app.set("query parser", "extended");
   app.enableVersioning();
+
+  app.enableCors(CORS_CONFIG);
+  app.use(cookieParser());
+  app.use(bodyParser.json({ limit: "50mb" }));
+  app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
   app.useGlobalPipes(new CustomZodValidationPipe());
+
+  const config = new DocumentBuilder()
+    .setTitle("BOOKS LIBRARY API")
+    .setDescription("Books library api swagger UI")
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("docs", app, document);
 
   await app.listen(configService.get("PORT", { infer: true }));
 }

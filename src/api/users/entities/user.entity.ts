@@ -1,14 +1,13 @@
+import { fullNameReturner } from "$/utils/misc";
 import type { User } from "$prisma/client";
 
 export function userTransformer(user: User) {
-  const {
-    createdAt: _createAt,
-    updatedAt: _updatedAt,
-    ...restUserFields
-  } = user;
+  const { id, role, email, firstName, lastName } = user;
 
   return {
-    ...restUserFields,
-    fullName: `${user.firstName} ${user.lastName}`
+    id,
+    role,
+    email,
+    fullName: fullNameReturner(firstName, lastName)
   };
 }
