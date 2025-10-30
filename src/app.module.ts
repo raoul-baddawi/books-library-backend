@@ -3,12 +3,13 @@ import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
+import { AuthModule } from "./api/auth/auth.module";
+import { BooksModule } from "./api/books/books.module";
 import { UsersModule } from "./api/users/users.module";
 import { AppController } from "./app.controller";
 import { envSchema } from "./config/config.schema";
 import { validateConfig } from "./config/config.utils";
 import { PrismaModule } from "./integrations/prisma/prisma.module";
-import { BooksModule } from "./api/books/books.module";
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { BooksModule } from "./api/books/books.module";
     }),
     PrismaModule,
     UsersModule,
-    BooksModule
+    BooksModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [

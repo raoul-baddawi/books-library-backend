@@ -1,5 +1,5 @@
+import type { Response } from "express";
 import { z } from "zod";
-import { Response } from "express";
 
 export function transformObject<T extends object | object[], U extends object>(
   input: T,

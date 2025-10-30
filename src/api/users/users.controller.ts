@@ -9,31 +9,28 @@ import {
   Post,
   Query
 } from "@nestjs/common";
+import { ApiConsumes } from "@nestjs/swagger";
 
 import { TransformResponse } from "$/core/decorators/transform.decorators";
+import { User, UserRoleEnum } from "$prisma/index";
 
+import { AllowedRoles, AuthUser, Public } from "../auth/decorators";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { FindUsersDto } from "./dto/find-users.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { userTransformer } from "./entities/user.entity";
 import { UsersService } from "./users.service";
-import { AllowedRoles, Public } from "../auth/decorators";
-import { UserRoleEnum } from "$prisma/index";
-import { ApiConsumes } from "@nestjs/swagger";
 
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
-  @TransformResponse(userTransformer)
-  @Get()
-  findAll(@Query() filter: FindUsersDto) {
-    return this.usersService.findAll(filter);
+  @Post("get-all")
+  findAll(@AuthUser() user: User, @Body() filter: FindUsersDto) {
+    return this.usersService.findAll(user.id, filter);
   }
 
   @Public()
-  @TransformResponse(userTransformer)
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.findOne(id);
@@ -46,7 +43,7 @@ export class UsersController {
     return this.usersService.create(data);
   }
 
-  @AllowedRoles(UserRoleEnum.ADMIN)
+  @AllowedRoles(UserRoleEnum.AUTHOR)
   @ApiConsumes("application/x-www-form-urlencoded")
   @Patch(":id")
   update(@Param("id", ParseIntPipe) id: number, @Body() data: UpdateUserDto) {
@@ -54,7 +51,7 @@ export class UsersController {
   }
 
   @AllowedRoles(UserRoleEnum.ADMIN)
-  @Delete(":id")
+  @Post("delete/:id")
   delete(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.delete(id);
   }

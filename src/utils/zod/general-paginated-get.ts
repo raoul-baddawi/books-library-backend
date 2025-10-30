@@ -1,10 +1,16 @@
-import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-export const findGeneralSchema = z.strictObject({
-  search: z.string().trim().min(1).optional(),
-  limit: z.coerce.number().int().min(10).max(50).optional(),
-  offset: z.coerce.number().int().nonnegative().optional()
+export const generalTablePaginationSchema = z.strictObject({
+  pagination: z
+    .object({
+      offset: z.coerce.number().int().min(0).optional(),
+      limit: z.coerce.number().int().min(10).max(50).optional()
+    })
+    .optional(),
+  sorting: z
+    .object({
+      key: z.string().trim().min(1),
+      order: z.enum(["asc", "desc"]).optional()
+    })
+    .optional()
 });
-
-export class FindGeneralDto extends createZodDto(findGeneralSchema) {}

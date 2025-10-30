@@ -30,7 +30,7 @@ async function main() {
   }
 
   Logger.log("Seeding users...");
-  await seedUsers(prisma);
+  await seedUsers(prisma, { length: 50 });
   Logger.log("Users seeded!");
   const userIds = (await prisma.user.findMany({ select: { id: true } })).map(
     ({ id }) => id

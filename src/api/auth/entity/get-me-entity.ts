@@ -1,5 +1,5 @@
-import { fullNameReturner, getS3Url } from "$/utils/misc";
-import { Prisma, UserRoleEnum } from "$prisma/index";
+import { fullNameReturner } from "$/utils/misc";
+import type { Prisma, UserRoleEnum } from "$prisma/index";
 
 type MeUserTransformed = {
   id: number;

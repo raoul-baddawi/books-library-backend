@@ -7,9 +7,11 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import * as argon from "argon2";
+
 import { PrismaService } from "$/integrations/prisma/prisma.service";
-import { LoginUserDto, RegisterUserDto } from "./dto";
 import { User } from "$prisma/client";
+
+import { LoginUserDto, RegisterUserDto } from "./dto";
 
 @Injectable()
 export class AuthService {
@@ -45,16 +47,10 @@ export class AuthService {
     });
 
     if (user) {
-      throw new HttpException(
-        "L'utilisateur existe déjà",
-        HttpStatus.NOT_FOUND
-      );
+      throw new HttpException("User already exists", HttpStatus.NOT_FOUND);
     }
     if (password !== confirmPassword) {
-      throw new HttpException(
-        "Les mots de passe ne correspondent pas",
-        HttpStatus.BAD_REQUEST
-      );
+      throw new HttpException("Passwords do not match", HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -71,10 +67,7 @@ export class AuthService {
 
     const verified = await argon.verify(user.password, data.password);
     if (!verified) {
-      throw new HttpException(
-        "Le mot de passe ou l'adresse n'est pas correct",
-        HttpStatus.BAD_REQUEST
-      );
+      throw new HttpException("Invalid credentials", HttpStatus.BAD_REQUEST);
     }
 
     return this.signToken(user);
@@ -98,9 +91,16 @@ export class AuthService {
   }
 
   async getMyUserData(user: User) {
+    if (!user) {
+      throw new UnauthorizedException("User not found");
+    }
     const userData = await this.db.user.findUnique({
       where: {
         id: user.id
+      },
+      omit: {
+        password: true,
+        updatedAt: true
       }
     });
 

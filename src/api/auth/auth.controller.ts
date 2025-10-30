@@ -1,13 +1,15 @@
-import { Controller, Body, Post, Get, Res } from "@nestjs/common";
-import { ApiTags, ApiConsumes } from "@nestjs/swagger";
-import { AuthService } from "./auth.service";
-import { LoginUserDto, RegisterUserDto } from "./dto";
-import { AuthUser, Public } from "./decorators";
+import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
-import { User } from "$prisma/client";
-import { responseTokenCookie } from "$/utils/misc";
+
 import { TransformResponse } from "$/core/decorators/transform.decorators";
+import { responseTokenCookie } from "$/utils/misc";
+import { User } from "$prisma/client";
+
 import { userTransformer } from "../users/entities/user.entity";
+import { AuthService } from "./auth.service";
+import { AuthUser, Public } from "./decorators";
+import { LoginUserDto, RegisterUserDto } from "./dto";
 
 @Controller("auth")
 @ApiTags("Auth")

@@ -47,12 +47,13 @@ model Book {
 
   name        String
   description String
+  genre       String
   media       String[]
 
   isPublished Boolean @default(false)
 
   authorId Int
-  author   User @relation(fields: [authorId], references: [id])
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   deletedAt DateTime?
 

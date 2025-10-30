@@ -14,7 +14,8 @@ function generateBookSeed(authorId: number) {
     ),
     isPublished,
     publishedAt,
-    authorId
+    authorId,
+    genre: faker.book.genre()
   } satisfies Prisma.BookCreateManyInput;
 }
 

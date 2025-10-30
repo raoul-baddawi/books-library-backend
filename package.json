@@ -6,8 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "seed": "ts-node prisma/seed.ts",
     "generate": "npx prisma generate",
+    "db:seed": "ts-node prisma/seed.ts",
     "db:push": "npx prisma db push",
     "db:reset": "npx prisma migrate reset",
     "db:migrate": "npx prisma migrate dev",

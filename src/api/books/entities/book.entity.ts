@@ -1,5 +1,5 @@
 import { fullNameReturner, getS3Url } from "$/utils/misc";
-import { Prisma } from "$prisma/index";
+import type { Prisma } from "$prisma/index";
 
 export function bookTransformer(
   book: Prisma.BookGetPayload<{
@@ -8,7 +8,16 @@ export function bookTransformer(
     };
   }>
 ) {
-  const { id, name, description, media, isPublished, author, authorId } = book;
+  const {
+    id,
+    name,
+    description,
+    media,
+    isPublished,
+    author,
+    authorId,
+    publishedAt
+  } = book;
   const authorName = fullNameReturner(author.firstName, author.lastName);
   return {
     id,
@@ -17,6 +26,7 @@ export function bookTransformer(
     authorName,
     description,
     isPublished,
+    publishedAt,
     media: media.map(getS3Url)
   };
 }

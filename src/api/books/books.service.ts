@@ -1,22 +1,52 @@
-import { PrismaService } from "$/integrations/prisma/prisma.service";
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { CreateBookDto, FindBooksDto } from "./dto/book.dto";
+
+import { PrismaService } from "$/integrations/prisma/prisma.service";
 import { createDateFilter } from "$/utils/date/range-date.builder";
+
+import { CreateBookDto, FindBooksDto } from "./dto/book.dto";
 
 @Injectable()
 export class BooksService {
   constructor(private readonly db: PrismaService) {}
 
   async getBooks(filters: FindBooksDto) {
-    const { search, dateRange, limit, offset } = filters;
+    const { search, dateRange, limit, page, genre } = filters;
+    const offset = page && limit ? (page - 1) * limit : 0;
     return this.db.book.findMany({
       where: {
-        name: search ? { contains: search, mode: "insensitive" } : undefined,
+        OR: search
+          ? [
+              { name: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } }
+            ]
+          : undefined,
         createdAt: createDateFilter(dateRange),
-        deletedAt: null
+        deletedAt: null,
+        genre: genre ? { in: genre } : undefined
+      },
+      include: {
+        author: true
       },
       take: limit,
       skip: offset
+    });
+  }
+
+  async getBooksGenreFilterOptions() {
+    const genres = await this.db.book.findMany({
+      where: {
+        deletedAt: null
+      },
+      select: {
+        genre: true
+      },
+      distinct: ["genre"]
+    });
+    return genres.map((g) => {
+      return {
+        label: g.genre,
+        value: g.genre
+      };
     });
   }
 

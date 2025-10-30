@@ -1,21 +1,24 @@
-import crypto from "node:crypto";
-
 import { Injectable } from "@nestjs/common";
 
 import { PrismaService } from "$/integrations/prisma/prisma.service";
+import { createDateFilter } from "$/utils/date/range-date.builder";
 import { Prisma } from "$prisma/client";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { FindUsersDto } from "./dto/find-users.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { createDateFilter } from "$/utils/date/range-date.builder";
+import { userTransformer } from "./entities/user.entity";
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(filter: FindUsersDto) {
-    const searchQuery = filter.search?.split(" ").flatMap((searchTerm) => {
+  async findAll(userId: number, filter: FindUsersDto) {
+    const { pagination, sorting, filters } = filter;
+    const { dateRange, role, search } = filters || {};
+    const { offset, limit } = pagination || {};
+    const { key, order } = sorting || {};
+    const searchQuery = search?.split(" ").flatMap((searchTerm) => {
       return [
         {
           firstName: {
@@ -31,20 +34,50 @@ export class UsersService {
         }
       ] satisfies Prisma.UserWhereInput[];
     });
-    const createdAt = createDateFilter(filter.dateRange);
-    return this.prisma.user.findMany({
+    const createdAt = createDateFilter(dateRange);
+
+    const users = await this.prisma.user.findMany({
       where: {
         OR: searchQuery,
-        createdAt
+        role: role || undefined,
+        createdAt,
+        id: { not: userId }
       },
-      skip: filter.offset,
-      take: filter.limit
+      skip: offset && limit ? offset * limit : 0,
+      take: limit,
+      orderBy: key
+        ? {
+            [key]: order || "desc"
+          }
+        : {
+            createdAt: "desc"
+          }
     });
+
+    const count = await this.prisma.user.count({
+      where: {
+        OR: searchQuery,
+        role: role || undefined,
+        createdAt
+      }
+    });
+
+    return {
+      data: users.map((user) => userTransformer(user)),
+      count
+    };
   }
 
   findOne(id: number) {
     return this.prisma.user.findUniqueOrThrow({
-      where: { id }
+      where: { id },
+      select: {
+        lastName: true,
+        firstName: true,
+        email: true,
+        role: true,
+        id: true
+      }
     });
   }
 
@@ -62,7 +95,7 @@ export class UsersService {
   }
 
   async delete(id: number) {
-    await this.prisma.user.delete({
+    return await this.prisma.user.delete({
       where: { id }
     });
   }

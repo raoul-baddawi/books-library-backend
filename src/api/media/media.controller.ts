@@ -1,12 +1,12 @@
 import { Body, Controller, Post } from "@nestjs/common";
 
+import { Public } from "../auth/decorators";
 import { MediaService } from "../media/media.service";
 import {
   DeleteFileDto,
   GetMultiUploadUrlsDto,
   GetUploadUrlDto
 } from "./dto/media.dto";
-import { Public } from "../auth/decorators";
 
 @Public()
 @Controller("media")

@@ -1,14 +1,15 @@
 import { ConfigService } from "@nestjs/config";
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
-import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import * as bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
+import { JwtGuard } from "./api/auth/guard";
 import { AppModule } from "./app.module";
 import type { EnvSchema } from "./config/config.schema";
 import { CustomZodValidationPipe } from "./core/pipes/validation.pipe";
 import { CORS_CONFIG } from "./utils/constants/config.constants";
-import cookieParser from "cookie-parser";
-import * as bodyParser from "body-parser";
 
 async function bootstrap() {
   // I could use fastify instead of express for a real production application
@@ -30,6 +31,8 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: "50mb" }));
   app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
   app.useGlobalPipes(new CustomZodValidationPipe());
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new JwtGuard(reflector));
 
   const config = new DocumentBuilder()
     .setTitle("BOOKS LIBRARY API")

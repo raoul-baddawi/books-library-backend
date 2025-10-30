@@ -9,13 +9,15 @@ import {
   Post,
   Query
 } from "@nestjs/common";
+import { ApiConsumes } from "@nestjs/swagger";
+
+import { TransformResponse } from "$/core/decorators/transform.decorators";
+import { User, UserRoleEnum } from "$prisma/client";
+
+import { AllowedRoles, AuthUser, Public } from "../auth/decorators";
 import { BooksService } from "./books.service";
 import { CreateBookDto, FindBooksDto, UpdateBookDto } from "./dto/book.dto";
-import { AllowedRoles, AuthUser, Public } from "../auth/decorators";
-import { User, UserRoleEnum } from "$prisma/client";
-import { TransformResponse } from "$/core/decorators/transform.decorators";
 import { bookTransformer } from "./entities/book.entity";
-import { ApiConsumes } from "@nestjs/swagger";
 
 @Controller("books")
 export class BooksController {
@@ -26,6 +28,12 @@ export class BooksController {
   @TransformResponse(bookTransformer)
   async getBooks(@Query() filter: FindBooksDto) {
     return this.booksService.getBooks(filter);
+  }
+
+  @Get("genre-options")
+  @Public()
+  async getBooksFilterOptions() {
+    return this.booksService.getBooksGenreFilterOptions();
   }
 
   @Get(":id")

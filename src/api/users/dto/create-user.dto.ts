@@ -1,7 +1,8 @@
-import { zodRoleEnumSchema } from "$/utils/zod/user-role";
-import { UserRoleEnum } from "$prisma/index";
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
+
+import { zodRoleEnumSchema } from "$/utils/zod/user-role";
+import { UserRoleEnum } from "$prisma/index";
 
 export const createUserSchema = z.strictObject({
   firstName: z.string().trim().min(2),
