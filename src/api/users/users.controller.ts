@@ -18,12 +18,17 @@ import { AllowedRoles, AuthUser, Public } from "../auth/decorators";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { FindUsersDto } from "./dto/find-users.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { userTransformer } from "./entities/user.entity";
 import { UsersService } from "./users.service";
 
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get("select-options")
+  @Public()
+  async getAuthorsSelectOptions() {
+    return this.usersService.getAuthorsSelectOptions();
+  }
 
   @Post("get-all")
   findAll(@AuthUser() user: User, @Body() filter: FindUsersDto) {
@@ -43,7 +48,7 @@ export class UsersController {
     return this.usersService.create(data);
   }
 
-  @AllowedRoles(UserRoleEnum.AUTHOR)
+  @AllowedRoles(UserRoleEnum.ADMIN)
   @ApiConsumes("application/x-www-form-urlencoded")
   @Patch(":id")
   update(@Param("id", ParseIntPipe) id: number, @Body() data: UpdateUserDto) {

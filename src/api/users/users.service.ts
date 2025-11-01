@@ -8,7 +8,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { FindUsersDto } from "./dto/find-users.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { userTransformer } from "./entities/user.entity";
-
+import * as argon from "argon2";
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -82,15 +82,24 @@ export class UsersService {
   }
 
   async create(data: CreateUserDto) {
+    const hashedPassword = await argon.hash(data.password);
     await this.prisma.user.create({
-      data
+      data: {
+        ...data,
+        password: hashedPassword
+      }
     });
   }
 
   async update(id: number, data: UpdateUserDto) {
     await this.prisma.user.update({
       where: { id },
-      data
+      data: {
+        ...data,
+        ...(data.password && {
+          password: await argon.hash(data.password)
+        })
+      }
     });
   }
 
@@ -98,5 +107,22 @@ export class UsersService {
     return await this.prisma.user.delete({
       where: { id }
     });
+  }
+
+  async getAuthorsSelectOptions() {
+    const authors = await this.prisma.user.findMany({
+      where: {
+        role: "AUTHOR"
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true
+      }
+    });
+    return authors.map((author) => ({
+      label: `${author.firstName} ${author.lastName}`,
+      value: author.id.toString()
+    }));
   }
 }

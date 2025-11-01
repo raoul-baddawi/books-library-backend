@@ -17,7 +17,6 @@ datasource db {
 
 enum UserRoleEnum {
   AUTHOR
-  USER
   ADMIN
 }
 
@@ -29,7 +28,7 @@ model User {
   firstName String
   lastName  String
 
-  role     UserRoleEnum @default(USER)
+  role     UserRoleEnum @default(AUTHOR)
   email    String       @unique
   password String
 

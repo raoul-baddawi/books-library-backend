@@ -1,13 +1,18 @@
 import { faker } from "@faker-js/faker/locale/fr";
 
 import type { Prisma, PrismaClient } from "$prisma/client";
+import * as argon from "argon2";
 
-function generateUserSeed() {
+async function generateUserSeed() {
+  const passwordHash = await argon.hash("test123");
+  const randomInt = Math.floor(Math.random() * 100);
+  const isEven = randomInt % 2 === 0;
   return {
     email: faker.internet.email(),
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
-    password: faker.internet.password()
+    password: passwordHash,
+    role: isEven ? "ADMIN" : "AUTHOR"
   } satisfies Prisma.UserCreateManyInput;
 }
 
@@ -21,7 +26,9 @@ export async function seedUsers(
 ) {
   const length = options?.length || 10;
 
-  const seededUsers = Array.from({ length }, () => generateUserSeed());
+  const seededUsers = await Promise.all(
+    Array.from({ length }, () => generateUserSeed())
+  );
 
   await prisma.user.createMany({
     data: seededUsers,

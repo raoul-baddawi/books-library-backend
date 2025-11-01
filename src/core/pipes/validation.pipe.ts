@@ -8,7 +8,7 @@ export const CustomZodValidationPipe = createZodValidationPipe({
 
     return new BadRequestException({
       code: "invalid_payload",
-      message: "Le payload de la requête est invalide",
+      message: "Payload validation failed",
       ctx
     });
   }

@@ -9,7 +9,7 @@ export const createUserSchema = z.strictObject({
   lastName: z.string().trim().min(2),
   email: z.email(),
   password: z.string().min(6),
-  role: zodRoleEnumSchema.default(UserRoleEnum.USER)
+  role: zodRoleEnumSchema.default(UserRoleEnum.AUTHOR)
 });
 
 export class CreateUserDto extends createZodDto(createUserSchema) {}

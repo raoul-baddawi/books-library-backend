@@ -3,16 +3,18 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { PrismaService } from "$/integrations/prisma/prisma.service";
 import { createDateFilter } from "$/utils/date/range-date.builder";
 
-import { CreateBookDto, FindBooksDto } from "./dto/book.dto";
+import { CreateBookDto, FindAdminBooksDto, FindBooksDto } from "./dto/book.dto";
+import { Prisma } from "$prisma/index";
+import { adminBookTransformer, bookTransformer } from "./entities/book.entity";
 
 @Injectable()
 export class BooksService {
-  constructor(private readonly db: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getBooks(filters: FindBooksDto) {
     const { search, dateRange, limit, page, genre } = filters;
     const offset = page && limit ? (page - 1) * limit : 0;
-    return this.db.book.findMany({
+    return this.prisma.book.findMany({
       where: {
         OR: search
           ? [
@@ -32,8 +34,64 @@ export class BooksService {
     });
   }
 
+  async findAdminBooks(data: FindAdminBooksDto) {
+    const { pagination, sorting, filters } = data;
+    const { dateRange, search, genre, author } = filters || {};
+    const { offset, limit } = pagination || {};
+    const { key, order } = sorting || {};
+    const searchQuery = search?.split(" ").flatMap((searchTerm) => {
+      return [
+        {
+          name: {
+            contains: searchTerm,
+            mode: "insensitive"
+          }
+        },
+        {
+          description: {
+            contains: searchTerm,
+            mode: "insensitive"
+          }
+        }
+      ] satisfies Prisma.BookWhereInput[];
+    });
+    const createdAt = createDateFilter(dateRange);
+    let where: Prisma.BookWhereInput = {
+      OR: searchQuery,
+      genre: genre && genre.length ? { in: genre } : undefined,
+      authorId:
+        author && author.length ? { in: author.map(Number) } : undefined,
+      createdAt,
+      deletedAt: null
+    };
+    const books = await this.prisma.book.findMany({
+      where,
+      include: {
+        author: true
+      },
+      skip: offset && limit ? offset * limit : 0,
+      take: limit,
+      orderBy: key
+        ? {
+            [key]: order || "desc"
+          }
+        : {
+            createdAt: "desc"
+          }
+    });
+
+    const count = await this.prisma.book.count({
+      where
+    });
+
+    return {
+      data: books.map(adminBookTransformer),
+      count
+    };
+  }
+
   async getBooksGenreFilterOptions() {
-    const genres = await this.db.book.findMany({
+    const genres = await this.prisma.book.findMany({
       where: {
         deletedAt: null
       },
@@ -51,35 +109,41 @@ export class BooksService {
   }
 
   async getBookById(id: number) {
-    return this.db.book.findUnique({
-      where: { id }
-    });
-  }
-
-  async createBook(userId: number, data: CreateBookDto) {
-    const user = await this.db.user.findUnique({
-      where: { id: userId }
-    });
-    if (!user) {
-      throw new BadRequestException("User not found");
-    }
-    return this.db.book.create({
-      data: {
-        ...data,
-        authorId: userId
+    return this.prisma.book.findUnique({
+      where: { id },
+      include: {
+        author: true
       }
     });
   }
 
-  async updateBook(id: number, data: Partial<CreateBookDto>) {
-    return this.db.book.update({
+  async createBook(data: CreateBookDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: data.authorId }
+    });
+    if (!user) {
+      throw new BadRequestException("Author not found");
+    }
+    return this.prisma.book.create({
+      data: {
+        ...data,
+        authorId: user.id
+      }
+    });
+  }
+
+  async updateBook(id: number, { authorId, ...data }: Partial<CreateBookDto>) {
+    return this.prisma.book.update({
       where: { id },
-      data
+      data: {
+        ...data,
+        authorId: authorId ? Number(authorId) : undefined
+      }
     });
   }
 
   async deleteBook(id: number) {
-    return this.db.book.update({
+    return this.prisma.book.update({
       where: { id },
       data: { deletedAt: new Date() }
     });

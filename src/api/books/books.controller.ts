@@ -16,7 +16,12 @@ import { User, UserRoleEnum } from "$prisma/client";
 
 import { AllowedRoles, AuthUser, Public } from "../auth/decorators";
 import { BooksService } from "./books.service";
-import { CreateBookDto, FindBooksDto, UpdateBookDto } from "./dto/book.dto";
+import {
+  CreateBookDto,
+  FindAdminBooksDto,
+  FindBooksDto,
+  UpdateBookDto
+} from "./dto/book.dto";
 import { bookTransformer } from "./entities/book.entity";
 
 @Controller("books")
@@ -28,6 +33,12 @@ export class BooksController {
   @TransformResponse(bookTransformer)
   async getBooks(@Query() filter: FindBooksDto) {
     return this.booksService.getBooks(filter);
+  }
+
+  @AllowedRoles(UserRoleEnum.ADMIN)
+  @Post("get-all")
+  findAll(@Body() filter: FindAdminBooksDto) {
+    return this.booksService.findAdminBooks(filter);
   }
 
   @Get("genre-options")
@@ -46,11 +57,8 @@ export class BooksController {
   @Post()
   @ApiConsumes("application/x-www-form-urlencoded")
   @AllowedRoles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR)
-  async createBook(
-    @AuthUser() user: User,
-    @Body() createBookDto: CreateBookDto
-  ) {
-    return this.booksService.createBook(user.id, createBookDto);
+  async createBook(@Body() createBookDto: CreateBookDto) {
+    return this.booksService.createBook(createBookDto);
   }
 
   @Patch(":id")
@@ -63,7 +71,7 @@ export class BooksController {
     return this.booksService.updateBook(id, updateBookDto);
   }
 
-  @Delete(":id")
+  @Post("delete/:id")
   @AllowedRoles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR)
   async deleteBook(@Param("id", ParseIntPipe) id: number) {
     return this.booksService.deleteBook(id);

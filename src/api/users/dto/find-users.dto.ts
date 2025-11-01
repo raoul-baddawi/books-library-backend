@@ -8,7 +8,7 @@ import { zodRoleEnumSchema } from "$/utils/zod/user-role";
 export const findUsersSchema = generalTablePaginationSchema.extend({
   filters: z
     .strictObject({
-      search: z.string().trim().min(1).optional(),
+      search: z.string().optional(),
       dateRange: dateRangeSchema.optional().nullable(),
       role: zodRoleEnumSchema.optional()
     })
