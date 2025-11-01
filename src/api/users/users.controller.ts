@@ -30,6 +30,7 @@ export class UsersController {
     return this.usersService.getAuthorsSelectOptions();
   }
 
+  @AllowedRoles(UserRoleEnum.ADMIN)
   @Post("get-all")
   findAll(@AuthUser() user: User, @Body() filter: FindUsersDto) {
     return this.usersService.findAll(user.id, filter);

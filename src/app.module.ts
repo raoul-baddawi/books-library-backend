@@ -10,6 +10,7 @@ import { AppController } from "./app.controller";
 import { envSchema } from "./config/config.schema";
 import { validateConfig } from "./config/config.utils";
 import { PrismaModule } from "./integrations/prisma/prisma.module";
+import { MediaModule } from "./api/media/media.module";
 
 @Module({
   imports: [
@@ -24,22 +25,14 @@ import { PrismaModule } from "./integrations/prisma/prisma.module";
     ]),
     ConfigModule.forRoot({
       isGlobal: true,
-      // ignoreEnvFile: process.env.NODE_ENV === "production",
-      load: [
-        () => {
-          if (process.env.NODE_ENV === "production") {
-            // In production, we might want to load from a secure vault or similar
-            return {};
-          }
-          return {};
-        }
-      ],
+      envFilePath: ".env",
       validate: (config) => validateConfig(envSchema, config)
     }),
     PrismaModule,
     UsersModule,
     BooksModule,
-    AuthModule
+    AuthModule,
+    MediaModule
   ],
   controllers: [AppController],
   providers: [
