@@ -61,4 +61,5 @@ export class AuthController {
       message: `User ${user.email} logged out successfully`
     };
   }
+  //
 }
