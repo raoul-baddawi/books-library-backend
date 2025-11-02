@@ -31,6 +31,7 @@ export const fullNameReturner = (firstName?: string, lastName?: string) => {
 };
 
 export const responseTokenCookie = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   res: Response<any, Record<string, any>>,
   token?: string,
   // Default expiry: 24 hours

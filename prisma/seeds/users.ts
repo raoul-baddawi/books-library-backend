@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker/locale/fr";
+import { faker } from "@faker-js/faker/locale/en";
 import * as argon from "argon2";
 
 import type { Prisma, PrismaClient } from "$prisma/client";

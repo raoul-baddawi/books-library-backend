@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -54,7 +55,7 @@ export class UsersController {
   }
 
   @AllowedRoles(UserRoleEnum.ADMIN)
-  @Post("delete/:id")
+  @Delete("delete/:id")
   delete(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.delete(id);
   }

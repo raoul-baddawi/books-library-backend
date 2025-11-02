@@ -22,6 +22,7 @@ export class AuthService {
   ) {}
 
   private async signToken(user: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   }): Promise<string | undefined> {
     const payload = {

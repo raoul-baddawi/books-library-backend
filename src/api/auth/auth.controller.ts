@@ -46,10 +46,7 @@ export class AuthController {
   }
 
   @Post("logout")
-  async logout(
-    @Res({ passthrough: true }) res: Response,
-    @AuthUser() user: User
-  ) {
+  logout(@Res({ passthrough: true }) res: Response, @AuthUser() user: User) {
     // For now this function is not that much usefull, but it is here in case we need to implement server side logout logic in the future
     res.clearCookie("token", {
       httpOnly: true,

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -74,7 +75,7 @@ export class BooksController {
     return this.booksService.updateBook(id, user, updateBookDto);
   }
 
-  @Post("delete/:id")
+  @Delete("delete/:id")
   @AllowedRoles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR)
   async deleteBook(@Param("id", ParseIntPipe) id: number) {
     return this.booksService.deleteBook(id);

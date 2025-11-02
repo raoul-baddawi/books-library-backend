@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ExtractJwt.fromAuthHeaderAsBearerToken(),
         (request: Request) => {
           if (request.cookies && "token" in request.cookies) {
-            return request.cookies.token;
+            return request.cookies.token as string;
           }
           return null;
         }
@@ -39,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (user == null) {
       throw new UnauthorizedException("Unauthorized");
     }
-    const { password, ...rest } = user;
+    const { password: _, ...rest } = user;
     return rest;
   }
 }

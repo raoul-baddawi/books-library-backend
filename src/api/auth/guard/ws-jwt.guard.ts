@@ -12,6 +12,7 @@ export class WsAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const client = context.switchToWs().getClient();
+
     const header: string = client.handshake.headers["authorization"];
     const authToken = header.split(" ").pop();
     if (!authToken) {

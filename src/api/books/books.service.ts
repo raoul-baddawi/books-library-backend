@@ -137,6 +137,17 @@ export class BooksService {
     user: User,
     { authorId, ...data }: Partial<CreateBookDto>
   ) {
+    const findBook = await this.prisma.book.findUnique({
+      where: { id }
+    });
+    if (!findBook) {
+      throw new BadRequestException("Book not found");
+    }
+
+    if (user.role === "AUTHOR" && findBook.authorId !== user.id) {
+      throw new BadRequestException("You are not allowed to update this book");
+    }
+
     return this.prisma.book.update({
       where: { id },
       data: {
