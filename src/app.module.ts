@@ -19,7 +19,7 @@ import { MediaModule } from "./api/media/media.module";
 
     ThrottlerModule.forRoot([
       {
-        limit: 300, // 100 requests per
+        limit: 150, // 150 requests per
         ttl: 3000 // 3 seconds
       }
     ]),

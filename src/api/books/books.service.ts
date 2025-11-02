@@ -4,7 +4,7 @@ import { PrismaService } from "$/integrations/prisma/prisma.service";
 import { createDateFilter } from "$/utils/date/range-date.builder";
 
 import { CreateBookDto, FindAdminBooksDto, FindBooksDto } from "./dto/book.dto";
-import { Prisma } from "$prisma/index";
+import { Prisma, User } from "$prisma/index";
 import { adminBookTransformer, bookTransformer } from "./entities/book.entity";
 
 @Injectable()
@@ -117,27 +117,31 @@ export class BooksService {
     });
   }
 
-  async createBook(data: CreateBookDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: data.authorId }
+  async createBook(user: User, data: CreateBookDto) {
+    const dbUser = await this.prisma.user.findUnique({
+      where: { id: user.role === "AUTHOR" ? user.id : data.authorId }
     });
-    if (!user) {
+    if (!dbUser) {
       throw new BadRequestException("Author not found");
     }
     return this.prisma.book.create({
       data: {
         ...data,
-        authorId: user.id
+        authorId: dbUser.id
       }
     });
   }
 
-  async updateBook(id: number, { authorId, ...data }: Partial<CreateBookDto>) {
+  async updateBook(
+    id: number,
+    user: User,
+    { authorId, ...data }: Partial<CreateBookDto>
+  ) {
     return this.prisma.book.update({
       where: { id },
       data: {
         ...data,
-        authorId: authorId ? Number(authorId) : undefined
+        authorId: user.role === "AUTHOR" ? user.id : authorId
       }
     });
   }

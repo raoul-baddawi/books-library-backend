@@ -57,8 +57,11 @@ export class BooksController {
   @Post()
   @ApiConsumes("application/x-www-form-urlencoded")
   @AllowedRoles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR)
-  async createBook(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.createBook(createBookDto);
+  async createBook(
+    @AuthUser() user: User,
+    @Body() createBookDto: CreateBookDto
+  ) {
+    return this.booksService.createBook(user, createBookDto);
   }
 
   @Patch(":id")
@@ -66,9 +69,10 @@ export class BooksController {
   @AllowedRoles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR)
   async updateBook(
     @Param("id", ParseIntPipe) id: number,
+    @AuthUser() user: User,
     @Body() updateBookDto: UpdateBookDto
   ) {
-    return this.booksService.updateBook(id, updateBookDto);
+    return this.booksService.updateBook(id, user, updateBookDto);
   }
 
   @Post("delete/:id")
