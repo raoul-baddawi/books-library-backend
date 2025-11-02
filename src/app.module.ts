@@ -5,12 +5,12 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import { AuthModule } from "./api/auth/auth.module";
 import { BooksModule } from "./api/books/books.module";
+import { MediaModule } from "./api/media/media.module";
 import { UsersModule } from "./api/users/users.module";
 import { AppController } from "./app.controller";
 import { envSchema } from "./config/config.schema";
 import { validateConfig } from "./config/config.utils";
 import { PrismaModule } from "./integrations/prisma/prisma.module";
-import { MediaModule } from "./api/media/media.module";
 
 @Module({
   imports: [

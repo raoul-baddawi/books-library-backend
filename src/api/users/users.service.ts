@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import * as argon from "argon2";
 
 import { PrismaService } from "$/integrations/prisma/prisma.service";
 import { createDateFilter } from "$/utils/date/range-date.builder";
@@ -8,7 +9,6 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { FindUsersDto } from "./dto/find-users.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { userTransformer } from "./entities/user.entity";
-import * as argon from "argon2";
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}

@@ -2,10 +2,10 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 
 import { PrismaService } from "$/integrations/prisma/prisma.service";
 import { createDateFilter } from "$/utils/date/range-date.builder";
+import { Prisma, User } from "$prisma/index";
 
 import { CreateBookDto, FindAdminBooksDto, FindBooksDto } from "./dto/book.dto";
-import { Prisma, User } from "$prisma/index";
-import { adminBookTransformer, bookTransformer } from "./entities/book.entity";
+import { adminBookTransformer } from "./entities/book.entity";
 
 @Injectable()
 export class BooksService {
@@ -56,7 +56,7 @@ export class BooksService {
       ] satisfies Prisma.BookWhereInput[];
     });
     const createdAt = createDateFilter(dateRange);
-    let where: Prisma.BookWhereInput = {
+    const where: Prisma.BookWhereInput = {
       OR: searchQuery,
       genre: genre && genre.length ? { in: genre } : undefined,
       authorId:

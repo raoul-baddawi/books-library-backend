@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker/locale/fr";
+import * as argon from "argon2";
 
 import type { Prisma, PrismaClient } from "$prisma/client";
-import * as argon from "argon2";
 
 async function generateUserSeed() {
   const passwordHash = await argon.hash("test123");
