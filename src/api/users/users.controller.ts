@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseBoolPipe,
   ParseIntPipe,
   Patch,
   Post,
@@ -29,9 +28,8 @@ export class UsersController {
   async getAuthorsSelectOptions(
     @Query("isValidAuthors") isValidAuthors: string | undefined
   ) {
-    return this.usersService.getAuthorsSelectOptions(
-      JSON.parse(isValidAuthors || "false")
-    );
+    const isValid = JSON.parse(isValidAuthors || "false") as boolean;
+    return this.usersService.getAuthorsSelectOptions(isValid);
   }
 
   @AllowedRoles(UserRoleEnum.ADMIN)
