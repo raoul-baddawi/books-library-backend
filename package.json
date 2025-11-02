@@ -47,6 +47,7 @@
     "body-parser": "^2.2.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.6.1",
+    "express": "^5.1.0",
     "lodash": "^4.17.21",
     "nestjs-zod": "5.0.0",
     "passport-jwt": "^4.0.1",

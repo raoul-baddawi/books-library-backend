@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Res } from "@nestjs/common";
 import { ApiConsumes, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import type { Response } from "express";
 
 import { TransformResponse } from "$/core/decorators/transform.decorators";
 import { responseTokenCookie } from "$/utils/misc";
