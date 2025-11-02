@@ -34,7 +34,7 @@ export class BooksService {
     });
   }
 
-  async findAdminBooks(data: FindAdminBooksDto) {
+  async findAdminBooks(user: User, data: FindAdminBooksDto) {
     const { pagination, sorting, filters } = data;
     const { dateRange, search, genre, author } = filters || {};
     const { offset, limit } = pagination || {};
@@ -55,12 +55,17 @@ export class BooksService {
         }
       ] satisfies Prisma.BookWhereInput[];
     });
+
     const createdAt = createDateFilter(dateRange);
     const where: Prisma.BookWhereInput = {
       OR: searchQuery,
       genre: genre && genre.length ? { in: genre } : undefined,
       authorId:
-        author && author.length ? { in: author.map(Number) } : undefined,
+        user.role === "AUTHOR"
+          ? user.id
+          : author && author.length
+            ? { in: author.map(Number) }
+            : undefined,
       createdAt,
       deletedAt: null
     };

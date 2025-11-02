@@ -109,10 +109,17 @@ export class UsersService {
     });
   }
 
-  async getAuthorsSelectOptions() {
+  async getAuthorsSelectOptions(isValidAuthors: boolean) {
     const authors = await this.prisma.user.findMany({
       where: {
-        role: "AUTHOR"
+        role: "AUTHOR",
+        ...(isValidAuthors && {
+          books: {
+            some: {
+              deletedAt: null
+            }
+          }
+        })
       },
       select: {
         id: true,

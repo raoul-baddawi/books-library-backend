@@ -4,9 +4,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Patch,
-  Post
+  Post,
+  Query
 } from "@nestjs/common";
 import { ApiConsumes } from "@nestjs/swagger";
 
@@ -24,8 +26,12 @@ export class UsersController {
 
   @Get("select-options")
   @Public()
-  async getAuthorsSelectOptions() {
-    return this.usersService.getAuthorsSelectOptions();
+  async getAuthorsSelectOptions(
+    @Query("isValidAuthors") isValidAuthors: string | undefined
+  ) {
+    return this.usersService.getAuthorsSelectOptions(
+      JSON.parse(isValidAuthors || "false")
+    );
   }
 
   @AllowedRoles(UserRoleEnum.ADMIN)

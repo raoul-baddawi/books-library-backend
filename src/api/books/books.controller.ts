@@ -37,8 +37,8 @@ export class BooksController {
 
   @AllowedRoles(UserRoleEnum.ADMIN, UserRoleEnum.AUTHOR)
   @Post("get-all")
-  findAll(@Body() filter: FindAdminBooksDto) {
-    return this.booksService.findAdminBooks(filter);
+  findAll(@AuthUser() user: User, @Body() filter: FindAdminBooksDto) {
+    return this.booksService.findAdminBooks(user, filter);
   }
 
   @Get("genre-options")
