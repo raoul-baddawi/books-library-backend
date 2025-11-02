@@ -87,9 +87,7 @@ jobs:
             if pm2 list | grep -q "${{secrets.APP_NAME}}"; then
               pm2 restart "${{secrets.APP_NAME}}"
             else
-              cd app
-              pm2 start dist/main.js --name "${{secrets.APP_NAME}}" --time
-              cd ~
+              pm2 start app/dist/main.js --name "${{secrets.APP_NAME}}" --time
             fi
 
             rm -rf ~/app-previous
