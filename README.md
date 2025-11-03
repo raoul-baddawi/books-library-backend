@@ -163,7 +163,22 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
 
 ---
 
-## 🐳 Docker Setup
+## � Test Credentials
+
+To test the application, you can use the following credentials:
+
+**Admin Account:**
+
+- **Email:** `raoulbaddawi1@gmail.com`
+- **Password:** `test123`
+
+**Author Account:**
+
+- Authors can be registered automatically via the signup page
+
+---
+
+## �🐳 Docker Setup
 
 > **Note**: Docker setup is available in the `feat-docker` branch. Switch to that branch to use the containerized environment.
 >
