@@ -163,7 +163,13 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
 
 ---
 
-## � Docker Setup
+## 🐳 Docker Setup
+
+> **Note**: Docker setup is available in the `feat-docker` branch. Switch to that branch to use the containerized environment.
+>
+> ```bash
+> git checkout feat-docker
+> ```
 
 If you prefer running the application in a containerized environment, Docker provides an isolated and consistent setup.
 
