@@ -4,11 +4,11 @@ generator client {
   output        = "../generated/prisma/client"
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-  theme    = "forest"
-  output   = "./generated/erd.svg"
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   theme    = "forest"
+//   output   = "./generated/erd.svg"
+// }
 
 datasource db {
   provider = "postgresql"

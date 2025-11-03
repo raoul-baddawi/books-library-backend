@@ -38,19 +38,19 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
 
 ## 🚀 Setup Instructions
 
-```bash
+````bash
 
-### Prerequisites$ pnpm run start:dev
+### Prerequisites
 
-```
+- **Node.js** (v18 or higher) - *Not required if using Docker*
+- **pnpm** (v8 or higher) - *Not required if using Docker*
+- **Docker** and **Docker Compose** (optional, for containerized setup)
+- **PostgreSQL** database - *Automatically set up with Docker*
+- **AWS S3** bucket (for media storage)
 
-- **Node.js** (v18 or higher)
+## This template comes with the following:
 
-- **pnpm** (v8 or higher)## This template comes with the following:
-
-- **PostgreSQL** database
-
-- **AWS S3** bucket (for media storage)- Eslint setup out of the box
+- Eslint setup out of the box
 
 - Prettier setup out of the box
 
@@ -63,7 +63,7 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
    ```bash
    git clone <repository-url>
    cd books-library-backend
-   ```
+````
 
 2. **Install dependencies**
 
@@ -115,6 +115,8 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
 
    This creates the Prisma client in the `generated/prisma/client` folder.
 
+   > ⚠️ **Note**: The ERD generation in `prisma/schema.prisma` is commented out by default. Only uncomment it if you're working in a development environment, as it will cause Docker production builds to fail.
+
 6. **Run database migrations**
 
    ```bash
@@ -133,11 +135,21 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
 
 8. **Start the development server**
 
+   **Option A: Using Docker (Recommended)**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+   This will run the application in a dockerized container. The API will be available at `http://localhost:8080`
+
+   **Option B: Using Node.js directly**
+
    ```bash
    pnpm start:dev
    ```
 
-   The API will be available at `http://localhost:8080`
+   This starts the development server with hot reload. The API will be available at `http://localhost:8080`
 
 9. **Access the API documentation**
 
@@ -151,7 +163,62 @@ A robust RESTful API for managing books and users, built with NestJS, Prisma, Po
 
 ---
 
-## 📖 Application Overview
+## � Docker Setup
+
+If you prefer running the application in a containerized environment, Docker provides an isolated and consistent setup.
+
+### Prerequisites
+
+- **Docker** and **Docker Compose** installed on your machine
+
+### Quick Start with Docker
+
+1. **Configure environment variables**
+
+   Create a `.env` file in the root directory (see [Environment Variables](#environment-variables) for required variables).
+
+2. **Build and start the containers**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+   This command will:
+   - Build the Docker image for the application
+   - Start the PostgreSQL database container
+   - Start the application container
+   - Run database migrations automatically
+   - Start the NestJS application
+
+3. **Access the application**
+
+   The API will be running on `http://localhost:8080`
+
+   Access the Swagger documentation at `http://localhost:8080/docs`
+
+### Docker Commands
+
+| Command                      | Description                           |
+| ---------------------------- | ------------------------------------- |
+| `docker-compose up --build`  | Build and start all containers        |
+| `docker-compose up`          | Start containers (without rebuilding) |
+| `docker-compose down`        | Stop and remove containers            |
+| `docker-compose down -v`     | Stop containers and remove volumes    |
+| `docker-compose logs -f`     | View logs from all containers         |
+| `docker-compose logs -f app` | View logs from the app container only |
+| `docker-compose exec app sh` | Access shell inside the app container |
+| `docker-compose restart`     | Restart all containers                |
+
+### Docker Notes
+
+- The PostgreSQL database runs in a separate container and persists data using Docker volumes
+- The application automatically runs migrations on startup
+- Hot reload is enabled in development mode when using Docker
+- To rebuild after dependency changes, use `docker-compose up --build`
+
+---
+
+## �📖 Application Overview
 
 The Books Library Backend is a full-featured RESTful API that provides:
 
