@@ -60,3 +60,27 @@ model Book {
   @@index([isPublished])
   @@map("books")
 }
+
+enum GenderEnum {
+  BOY
+  GIRL
+}
+
+model GenderRevealSettings {
+  id         Int         @id @default(autoincrement())
+  gender     GenderEnum?
+  revealDate DateTime?
+  isRevealed Boolean     @default(false)
+
+  @@map("gender_reveal_settings")
+}
+
+model GenderGuess {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  name      String
+  guess     GenderEnum
+  mediaUrls String[]
+
+  @@map("gender_guesses")
+}

@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 
 import { AuthModule } from "./api/auth/auth.module";
 import { BooksModule } from "./api/books/books.module";
+import { GenderRevealModule } from "./api/gender-reveal/gender-reveal.module";
 import { MediaModule } from "./api/media/media.module";
 import { UsersModule } from "./api/users/users.module";
 import { AppController } from "./app.controller";
@@ -32,7 +33,8 @@ import { PrismaModule } from "./integrations/prisma/prisma.module";
     UsersModule,
     BooksModule,
     AuthModule,
-    MediaModule
+    MediaModule,
+    GenderRevealModule
   ],
   controllers: [AppController],
   providers: [

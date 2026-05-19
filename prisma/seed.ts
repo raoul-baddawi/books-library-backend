@@ -32,13 +32,13 @@ async function main() {
   Logger.log("Seeding users...");
   await seedUsers(prisma, { length: 50 });
   Logger.log("Users seeded!");
-  const userIds = (await prisma.user.findMany({ select: { id: true } })).map(
-    ({ id }) => id
-  );
+  // const userIds = (await prisma.user.findMany({ select: { id: true } })).map(
+  //   ({ id }) => id
+  // );
 
-  Logger.log("Seeding books...");
-  await seedBooks(prisma, { authorIds: userIds });
-  Logger.log("Books seeded!");
+  // Logger.log("Seeding books...");
+  // await seedBooks(prisma, { authorIds: userIds });
+  // Logger.log("Books seeded!");
 }
 
 main()
